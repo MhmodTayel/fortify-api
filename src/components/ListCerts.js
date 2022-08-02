@@ -11,6 +11,7 @@ export default function ListCerts() {
     (async () => {
       const providers = await getProviders();
       setProviders(providers);
+      console.log(providers);
     })();
   }, []);
 

@@ -20,6 +20,34 @@ async function getCertsByProviderId(id) {
   return api.getCertificatesByProviderId(id);
 }
 
+async function createSelfSignedCert() {
+  const api = new FortifyAPI();
+  await api.start();
+  const challenge = await api.challenge();
+  if (challenge) {
+    await api.login();
+  }
+  return api.createX509('dde8304444a100c56673ad3d43e80a8fb13f20ca', {
+    subjectName: 'testing',
+    signatureAlgorithm: 'RSA-2048',
+    hashAlgorithm: 'SHA-256',
+  });
+}
+
+async function createCSR() {
+  const api = new FortifyAPI();
+  await api.start();
+  const challenge = await api.challenge();
+  if (challenge) {
+    await api.login();
+  }
+  return api.createPKCS10('dde8304444a100c56673ad3d43e80a8fb13f20ca', {
+    subjectName: 'testing',
+    signatureAlgorithm: 'RSA-2048',
+    hashAlgorithm: 'SHA-256',
+  });
+}
+
 async function sign(providerId, certID, data) {
   const api = new FortifyAPI();
   await api.start();
@@ -68,4 +96,10 @@ async function GetCertificateKey(type, provider, certID) {
   return null;
 }
 
-export { getProviders, getCertsByProviderId, sign };
+export {
+  getProviders,
+  getCertsByProviderId,
+  sign,
+  createSelfSignedCert,
+  createCSR,
+};
