@@ -1,5 +1,10 @@
 import { useEffect, useState } from 'react';
-import { getCertsByProviderId, getProviders, sign } from '../helpers/helper';
+import {
+  getCertsByProviderId,
+  getProviders,
+  sign,
+  GetCommonName,
+} from '../helpers/helper';
 
 export default function ListCerts() {
   const [providers, setProviders] = useState([]);
@@ -11,7 +16,6 @@ export default function ListCerts() {
     (async () => {
       const providers = await getProviders();
       setProviders(providers);
-      console.log(providers);
     })();
   }, []);
 
@@ -19,52 +23,52 @@ export default function ListCerts() {
     setCertificates([]);
     const certs = await getCertsByProviderId(e.target.value);
     setProvider(e.target.value);
-    const certIDs = certs
-      .filter(({ index: id }) => {
-        const parts = id.split('-');
-        return parts[0] === 'x509';
-      })
-      .map((cert) => cert.index);
+    setCertificates(certs);
+    // const certIDs = certs
+    //   .filter(({ index: id }) => {
+    //     const parts = id.split('-');
+    //     return parts[0] === 'x509';
+    //   })
+    //   .map((cert) => cert.index);
 
-    const keyIDs = certs
-      .filter(({ privateKeyId: id }) => {
-        const parts = id.split('-');
-        return parts[0] === 'private';
-      })
-      .map((cert) => cert.privateKeyId);
+    // const keyIDs = certs
+    //   .filter(({ privateKeyId: id }) => {
+    //     const parts = id.split('-');
+    //     return parts[0] === 'private';
+    //   })
+    //   .map((cert) => cert.privateKeyId);
 
-    for (const certID of certIDs) {
-      for (const keyID of keyIDs) {
-        if (keyID.split('-')[2] === certID.split('-')[2]) {
-          try {
-            const cert = certs.find((cert) => cert.index === certID);
-            setCertificates([
-              ...certificates,
-              {
-                id: certID,
-                item: cert,
-              },
-            ]);
-          } catch (e) {
-            console.error(
-              `Cannot get certificate ${certID} from CertificateStorage. ${e.message}`
-            );
-          }
-        }
-      }
-    }
+    // for (const certID of certIDs) {
+    //   for (const keyID of keyIDs) {
+    //     if (keyID.split('-')[2] === certID.split('-')[2]) {
+    //       try {
+    //         const cert = certs.find((cert) => cert.index === certID);
+    //         setCertificates([
+    //           ...certificates,
+    //           {
+    //             id: certID,
+    //             item: cert,
+    //           },
+    //         ]);
+    //       } catch (e) {
+    //         console.error(
+    //           `Cannot get certificate ${certID} from CertificateStorage. ${e.message}`
+    //         );
+    //       }
+    //     }
+    //   }
+    // }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     const provider = e.target.provider.value;
-    const certificate = e.target.certificate.value;
+    const certId = e.target.certificate.value;
     const message = e.target.message.value;
 
-    const { ok, signature } = await sign(provider, certificate, {
+    const { ok, signature } = await sign(provider, certId, {
       data: message,
     });
-
     console.log({ ok, signature });
   };
 
@@ -88,11 +92,13 @@ export default function ListCerts() {
         <div className="group">
           <label htmlFor="certificates">Certificates:</label>
           <select id="certificates" name="certificate">
-            {certificates.map((cert) => (
-              <option value={cert.id} key={cert.id}>
-                {cert.item.subjectName}
-              </option>
-            ))}
+            {certificates.map((cert) => {
+              return (
+                <option value={cert.index} key={cert.id}>
+                  {GetCommonName(cert.subjectName)}
+                </option>
+              );
+            })}
           </select>
         </div>
         <br />

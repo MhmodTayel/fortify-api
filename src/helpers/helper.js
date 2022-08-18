@@ -27,7 +27,7 @@ async function createSelfSignedCert() {
   if (challenge) {
     await api.login();
   }
-  return api.createX509('dde8304444a100c56673ad3d43e80a8fb13f20ca', {
+  return api.createX509('fef6d42e488f4dcc6a223129bbfa22dbcfe95ef6', {
     subjectName: 'testing',
     signatureAlgorithm: 'RSA-2048',
     hashAlgorithm: 'SHA-256',
@@ -41,7 +41,8 @@ async function createCSR() {
   if (challenge) {
     await api.login();
   }
-  return api.createPKCS10('dde8304444a100c56673ad3d43e80a8fb13f20ca', {
+
+  return api.createPKCS10('fef6d42e488f4dcc6a223129bbfa22dbcfe95ef6', {
     subjectName: 'testing',
     signatureAlgorithm: 'RSA-2048',
     hashAlgorithm: 'SHA-256',
@@ -96,10 +97,29 @@ async function GetCertificateKey(type, provider, certID) {
   return null;
 }
 
+async function getCertificateById(providerId, id) {
+  const api = new FortifyAPI();
+  await api.start();
+  const challenge = await api.challenge();
+  if (challenge) {
+    await api.login();
+  }
+
+  return api.getCertificateBodyById(providerId, id);
+}
+
+function GetCommonName(name) {
+  var reg = /CN=(.+),?/i;
+  var res = reg.exec(name);
+  return res ? res[1] : 'Unknown';
+}
+
 export {
   getProviders,
   getCertsByProviderId,
   sign,
   createSelfSignedCert,
   createCSR,
+  getCertificateById,
+  GetCommonName
 };

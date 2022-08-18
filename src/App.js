@@ -9,10 +9,10 @@ function App() {
       <header className="App-header">
         <h2>List certificates</h2>
         <ListCerts />
-        <h2>Create self signed certificate</h2>
+        {/* <h2>Create self signed certificate</h2>
         <SelfSignedCert />
         <h2>Create CSR</h2>
-        <CSR />
+        <CSR /> */}
       </header>
     </div>
   );
